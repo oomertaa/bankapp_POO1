@@ -11,6 +11,8 @@ class Investment{
       Investment();
       Investment(double suma, double rata, int perioada);
 
+      friend std::ostream& operator<<(std::ostream& out, const Investment& obj);
+
       //getter
       double getSumaInitiala() const;
       double getRataDobanzii() const;
@@ -44,11 +46,51 @@ Investment::Investment(double suma, double rata, int perioada){
    this->luni = perioada;
 }
 
+double Investment::getSumaInitiala() const{
+   return sumaInitiala;
+}
+
+double Investment::getRataDobanzii() const{
+   return rataDobanzii;
+}
+
+int Investment::getLuni() const{
+   return luni;
+}
+
+void Investment::setSumaInitiala(double suma){
+   this->sumaInitiala = suma;
+}
+
+void Investment::setRataDobanzii(double rata){
+   this->rataDobanzii = rata;
+}
+
+void Investment::setLuni(int nrLuni){
+   this->luni = nrLuni;
+}
+
 double Investment::calculeazaProfit() const{
    double rataLunara = rataDobanzii/ 12.0;
    double sumaFinala = sumaInitiala * std::pow(1.0 + rataLunara, luni);
 
    return sumaFinala - sumaInitiala;
+}
+
+double Investment::getSumaFinala() const{
+   return sumaInitiala + calculeazaProfit();
+}
+
+std::ostream& operator<<(std::ostream& out, const Investment& obj) {
+    out << "\n------- RAPORT INVESTITIE -------\n";
+    out << "Suma initiala:    " << obj.sumaInitiala << " RON\n";
+    out << "Rata dobanzii:   " << obj.rataDobanzii * 100 << "%\n";
+    out << "Durata:          " << obj.luni << " luni\n";
+    out << "---------------------------------\n";
+    out << "Profit estimat:  " << obj.calculeazaProfit() << " RON\n";
+    out << "Total final:     " << obj.getSumaFinala() << " RON\n";
+    out << "---------------------------------\n";
+    return out;
 }
 
 class BankAccount{
@@ -381,11 +423,11 @@ void Menu::run(){
             }
             case '3': {
                afisareFAQ();
+               afisareMeniuPrincipal();
                break;
             }
             case '4': {
                std::cout << "La revedere!\n";
-
                Sleep(4000);
                return;
             }
@@ -460,7 +502,29 @@ int Menu::actiuneConectat(Client* cln) {
                break;
             }
             case '4':{
-               //simulare investitii
+               system("cls");
+               double s,r;
+               int l;
+
+               std::cout << "~~~Pagina de simulare investitii~~~\n";
+               std::cout << "-----------------------Informatii-Importante---------------------------" << std::endl;
+               std::cout << "| Dobanda anuala estimata (Index Fund - S&P 500)          |    10.0%  |" << std::endl;
+               std::cout << "| Ajustat la inflatia dolarului (Profit Real)             |     7.0%  |" << std::endl;
+               std::cout << "| Depozit la termen optim in lei (RON)                    |   > 5.5%  |" << std::endl;
+               std::cout << "-----------------------------------------------------------------------" << std::endl;
+               std::cout << "Suma de investit (RON): ";
+               std::cin >> s;
+               std::cout << "Rata dobanzii anuale (scrieti 7 pentru 7%): "; 
+               std::cin >> r;
+               std::cout << "Perioada (in luni): ";
+               std::cin >> l;
+
+               Investment simulare(s, r / 100.0, l);
+
+               std::cout << simulare;
+
+               Sleep(10000);
+               system("cls");
                break;
             }
             case '5':{
@@ -572,20 +636,11 @@ void Menu::afisareFAQ(){
       std::cout << "Pentru a accesa modulul de investitii, trebuie sa fiti conectat la contul dvs. si sa aveti informatiile complete. Meniul pentru utilizator conectat va pune la dispozitie optiunea de a face simulari de investitii sau de a investi.\n";
       std::cout << "4. Cum se numeste aceasta banca?\n";
       std::cout << "Banca.\n\n";
-      std::cout << "Apasati orice tasta pentru a reveni la meniul principal.\n";
-      while(true){
-         if(_kbhit()){
-            char optiune = _getch();
-            if(optiune){
-               system("cls");
-               run();
-               return;
-            }
-         }
-      }
-
-   }
-
+      
+      Sleep(15000);
+      system("cls");
+      return;
+}
 
 int main() {
    Menu menu;
