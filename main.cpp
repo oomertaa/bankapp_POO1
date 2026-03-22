@@ -13,6 +13,8 @@ class Investment{
       Investment();
       Investment(double suma, double rata, int perioada);
 
+      static const float inflatie_leu;
+   
       friend std::ostream& operator<<(std::ostream& out, const Investment& obj);
 
       //getter
@@ -83,6 +85,8 @@ double Investment::getSumaFinala() const{
    return sumaInitiala + calculeazaProfit();
 }
 
+const float Investment::inflatie_leu = 7.2f;
+
 std::ostream& operator<<(std::ostream& out, const Investment& obj) {
     out << "\n------- RAPORT INVESTITIE -------\n";
     out << "Suma initiala:    " << obj.sumaInitiala << " RON\n";
@@ -140,6 +144,7 @@ class BankAccount{
       BankAccount(int suma);
       BankAccount(const BankAccount& obj);
       BankAccount& operator=(const BankAccount& obj);
+      ~BankAccount();
 
       friend std::ostream& operator<<(std::ostream& out, const BankAccount& obj);
       friend std::istream& operator>>(std::istream& in, BankAccount& obj);
@@ -151,31 +156,47 @@ class BankAccount{
       void setSold(int val);
       void setID(int val);
       void printTransactionHistory();
+      long totalIntrari();
+      long totalIesiri();
 
    private:
       int sold;
       int accID;
       Transaction istoric[10];
       int nrTranzactii = 0;
-
+      int* sumeIntrate;
+      int* sumeIesite;
 };
 
 BankAccount::BankAccount(){
    this->sold = 0;
    this->accID = rand()%1357;
+   sumeIntrate = new int[10]{0};
+   sumeIesite = new int[10]{0};
 }
 
 BankAccount::BankAccount(int val){
    this->sold = val;
-   this->accID = rand()%1357;   
+   this->accID = rand()%1357;
+   sumeIntrate = new int[10]{0};
+   sumeIesite = new int[10]{0};
 }
 
 BankAccount::BankAccount(const BankAccount& obj){
    this->sold = obj.sold;
    this->accID = obj.accID;
    this->nrTranzactii = obj.nrTranzactii;
+
    for(int i = 0; i < obj.nrTranzactii; i++){
       this -> istoric[i] = obj.istoric[i];
+   }
+
+   sumeIntrate = new int[10];
+   sumeIesite = new int[10];
+
+   for(int i = 0; i < 10; i++) {
+        sumeIntrate[i] = obj.sumeIntrate[i];
+        sumeIesite[i] = obj.sumeIesite[i];
    }
 }
 
@@ -184,11 +205,28 @@ BankAccount& BankAccount::operator=(const BankAccount& obj){
       this->sold = obj.sold;
       this->accID = obj.accID;
       this->nrTranzactii = obj.nrTranzactii;
+
       for(int i = 0; i < obj.nrTranzactii; i++){
          this -> istoric[i] = obj.istoric[i];
       }
+
+      delete[] sumeIntrate;
+        delete[] sumeIesite;
+
+        sumeIntrate = new int[10];
+        sumeIesite = new int[10];
+
+        for(int i = 0; i < 10; i++) {
+            sumeIntrate[i] = obj.sumeIntrate[i];
+            sumeIesite[i] = obj.sumeIesite[i];
+        }
    }
    return *this;
+}
+
+BankAccount::~BankAccount(){
+    delete[] sumeIntrate;
+    delete[] sumeIesite;
 }
 
 std::ostream& operator<<(std::ostream& out, const BankAccount& obj){
@@ -206,6 +244,7 @@ void BankAccount::depunereFonduri(int suma){
    this->sold += suma;
    if (nrTranzactii < 10) {
       istoric[nrTranzactii] = Transaction("Depunere", suma);
+      sumeIntrate[nrTranzactii] = suma;
       nrTranzactii++;
    }
 }
@@ -215,6 +254,7 @@ void BankAccount::retragereFonduri(int suma){
       this->sold -= suma;
       if(nrTranzactii < 10){
          istoric[nrTranzactii] = Transaction("Retragere", suma);
+         sumeIesite[nrTranzactii] = suma;
          nrTranzactii++;
       }
    }
@@ -244,6 +284,22 @@ void BankAccount::printTransactionHistory(){
       std::cout<<"Tranzactia " << i+1 <<":";
       std::cout<<istoric[i]<<"\n";
    }
+}
+
+long BankAccount::totalIntrari(){
+   long total = 0;
+   for (int i = 0; i < nrTranzactii; i++){
+      total += sumeIntrate[i];
+   }
+   return total;
+}
+
+long BankAccount::totalIesiri(){
+   long total = 0;
+   for(int i = 0; i < nrTranzactii; i++){
+      total += sumeIesite[i];
+   }
+   return total;
 }
 
 class Client{
