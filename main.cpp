@@ -9,96 +9,22 @@ public:
 
    static int numarClienti;
 
-   Client(){
-         this->nume = nullptr;
-         this->prenume = nullptr;
-         this->initialaTata = '\0';
-         this->dataNasterii = 0;
-         this->CNP = 0;
-         this->ID_client = 0;
-         this->informationComplete = false;
-   }
-
-   Client(const char* nume, const char* prenume, long long CNP){
-      this->nume = new char[strlen(nume) + 1];
-      strcpy(this->nume, nume);
-      this->prenume = new char[strlen(prenume) + 1];
-      strcpy(this->prenume, prenume);
-      this->CNP = CNP;
-      this->ID_client = CNP % 10000;
-      this->informationComplete = false;
-   }
-
-   Client(const char* nume, const char* prenume, char initialaTata, int dataNasterii, long long CNP){
-      this->nume = new char[strlen(nume) + 1];
-      strcpy(this->nume, nume);
-      this->prenume = new char[strlen(prenume) + 1];
-      strcpy(this->prenume, prenume);
-      this->initialaTata = initialaTata;
-      this->dataNasterii = dataNasterii;
-      this->CNP = CNP;
-      this->ID_client = CNP % 10000;
-      this->informationComplete = true;
-   };
-
-   Client(const Client& obj){
-      this->nume = new char[strlen(obj.nume) + 1];
-      strcpy(this->nume, obj.nume);
-      this->prenume = new char[strlen(obj.prenume) + 1];
-      strcpy(this->prenume, obj.prenume);
-      this->initialaTata = obj.initialaTata;
-      this->dataNasterii = obj.dataNasterii;
-      this->CNP = obj.CNP;
-      this->ID_client = obj.ID_client;
-      this->informationComplete = obj.informationComplete;
-   };
-
-   Client& operator=(const Client& obj) {
-      if (this != &obj) {
-         delete[] this->nume;
-         delete[] this->prenume;
-         this->nume = new char[strlen(obj.nume) + 1];
-         strcpy(this->nume, obj.nume);
-         this->prenume = new char[strlen(obj.prenume) + 1];
-         strcpy(this->prenume, obj.prenume);
-         this->initialaTata = obj.initialaTata;
-         this->dataNasterii = obj.dataNasterii;
-         this->CNP = obj.CNP;
-         this->ID_client = obj.ID_client;
-         this->informationComplete = obj.informationComplete;
-      }
-      return *this;
-   };
-
-   ~Client() {
-      delete[] nume;
-      delete[] prenume;
-   };
+   Client();
+   Client(const char* nume, const char* prenume, long long CNP);
+   Client(const char* nume, const char* prenume, char initialaTata, int dataNasterii, long long CNP);
+   Client(const Client& obj);
+   Client& operator=(const Client& obj);
+   ~Client();
 
 
    //getteri la toate atributele pentru verificari de securitate
-   char getInitialaTata() const {
-      return initialaTata;
-   };
-
-   const char* getNume() const { 
-      return this->nume;
-   }
-
-   long getID() const{
-      return ID_client;
-   };
-
-   long long getCNP() const {
-      return CNP;
-   };
+   char getInitialaTata() const;
+   const char* getNume() const;
+   long getID() const;
+   long long getCNP() const;
 
    //Clientul isi poate schimba numele..
-   void setName(char* nume) {
-      delete[] this->nume;
-      this-> nume = new char[strlen(nume) + 1];
-      strcpy(this->nume, nume);
-   }
+   void setName(const char* nume);
 
    friend std::ostream& operator<<(std::ostream& out, const Client& obj);
    friend std::istream& operator>>(std::istream& in, Client& obj);
@@ -113,73 +39,191 @@ private:
    bool informationComplete;
 };
 
+Client::Client(){
+         this->nume = nullptr;
+         this->prenume = nullptr;
+         this->initialaTata = '\0';
+         this->dataNasterii = 0;
+         this->CNP = 0;
+         this->ID_client = 0;
+         this->informationComplete = false;
+}
+
+Client::Client(const char* nume, const char* prenume, long long CNP){
+      this->nume = new char[strlen(nume) + 1];
+      strcpy(this->nume, nume);
+      this->prenume = new char[strlen(prenume) + 1];
+      strcpy(this->prenume, prenume);
+      this->CNP = CNP;
+      this->ID_client = CNP % 10000;
+      this->informationComplete = false;
+}
+
+
+Client::Client(const char* nume, const char* prenume, char initialaTata, int dataNasterii, long long CNP){
+      this->nume = new char[strlen(nume) + 1];
+      strcpy(this->nume, nume);
+      this->prenume = new char[strlen(prenume) + 1];
+      strcpy(this->prenume, prenume);
+      this->initialaTata = initialaTata;
+      this->dataNasterii = dataNasterii;
+      this->CNP = CNP;
+      this->ID_client = CNP % 10000;
+      this->informationComplete = true;
+};
+
+Client::Client(const Client& obj){
+      this->nume = new char[strlen(obj.nume) + 1];
+      strcpy(this->nume, obj.nume);
+      this->prenume = new char[strlen(obj.prenume) + 1];
+      strcpy(this->prenume, obj.prenume);
+      this->initialaTata = obj.initialaTata;
+      this->dataNasterii = obj.dataNasterii;
+      this->CNP = obj.CNP;
+      this->ID_client = obj.ID_client;
+      this->informationComplete = obj.informationComplete;
+};
+
+Client& Client::operator=(const Client& obj) {
+      if (this != &obj) {
+         delete[] this->nume;
+         delete[] this->prenume;
+         this->nume = new char[strlen(obj.nume) + 1];
+         strcpy(this->nume, obj.nume);
+         this->prenume = new char[strlen(obj.prenume) + 1];
+         strcpy(this->prenume, obj.prenume);
+         this->initialaTata = obj.initialaTata;
+         this->dataNasterii = obj.dataNasterii;
+         this->CNP = obj.CNP;
+         this->ID_client = obj.ID_client;
+         this->informationComplete = obj.informationComplete;
+      }
+      return *this;
+};
+
+Client::~Client() {
+      delete[] nume;
+      delete[] prenume;
+};
+
+char Client::getInitialaTata() const {
+    return initialaTata;
+}
+
+const char* Client::getNume() const {
+    return this->nume;
+}
+
+long Client::getID() const {
+    return ID_client;
+}
+
+long long Client::getCNP() const {
+    return CNP;
+}
+
+void Client::setName(const char* nume) {
+    if (nume != nullptr) {
+        delete[] this->nume;
+        this->nume = new char[strlen(nume) + 1];
+        strcpy(this->nume, nume);
+    }
+}
+
+std::ostream& operator<<(std::ostream& out, const Client& obj) {
+   out << "Date Client:\n";
+   out << "ID: " << obj.ID_client << "\n";
+   out << "CNP: " << obj.CNP << "\n";
+   out << "Nume: " << obj.nume << " " << obj.initialaTata << " " << obj.prenume << "\n";
+   out << "Data Nasterii: " << obj.dataNasterii << "\n";
+   return out;
+}
+
+std::istream& operator>>(std::istream& in, Client& obj) {
+   char buffer[100];
+   std::cout << "Nume: ";
+   in.getline(buffer, 100);
+   obj.setName(buffer);
+   return in;
+}
+
+int Client::numarClienti = 0;
+
 class Menu{
 public:
-
-   void run(){
-      afisareMeniuPrincipal();
-      while(true){
-         Sleep(500);
-         if(_kbhit()){
-            char optiune = _getch();
-            switch(optiune){
-               case '1': {
-                  Client* cln = verificareClient();
-                  if(cln != nullptr){
-                     system("cls");
-                     actiuneConectat(cln);
-                     return;
-                  }
-                  else{
-                     std::cout << "Acest cont nu exista.\n";
-                     Sleep(2500);
-                     system("cls");
-                     afisareMeniuPrincipal();
-                  }
-                  break;
-               }
-               case '2': {
-                  system("cls");
-                  Client *cln = creareCont();
-                  Sleep(2500);
-                  system("cls");
-                  actiuneConectat(cln);
-                  break;
-               }
-               case '3': {
-                  afisareFAQ();
-                  break;
-               }
-               case '4': {
-                  std::cout << "La revedere!\n";
-                  // localstorage
-                  Sleep(4000);
-                  return;
-               }
-            }
-         }
-      }
-   }
+  
+   void run();
 
 private:
 
    Client listaClienti[30];
 
+   void actiuneConectat(Client* cln);
+   void afisareMeniuPrincipal();
+   Client* verificareClient();
+   Client* creareCont();
+   void afisareFAQ();
+};
 
-   void actiuneConectat(Client* cln) {
-
-      std::cout << "Bine ati venit, Dl./Dna. " << cln->getNume() << "(Client ID: " << cln->getID() << ")!\n";
-   }
-
-   void afisareMeniuPrincipal() {
-      std::cout<<"-----Optiuni disponibile-----\n";
-      std::cout << "1. Conectare la contul dvs.\n";
-      std::cout << "2. Creati-va un cont\n";
-      std::cout << "3. FAQ\n";
-      std::cout << "4. Iesire\n";
+void Menu::run(){
+   afisareMeniuPrincipal();
+   while(true){
+      Sleep(500);
+      if(_kbhit()){
+         char optiune = _getch();
+         switch(optiune){
+            case '1': {
+               Client* cln = verificareClient();
+               if(cln != nullptr){
+                  system("cls");
+                  actiuneConectat(cln);
+                  return;
+               }
+               else{
+                  std::cout << "Acest cont nu exista.\n";
+                  Sleep(2500);
+                  system("cls");
+                  afisareMeniuPrincipal();
+               }
+               break;
+            }
+            case '2': {
+               system("cls");
+               Client *cln = creareCont();
+               Sleep(2500);
+               system("cls");
+               actiuneConectat(cln);
+               break;
+            }
+            case '3': {
+               afisareFAQ();
+               break;
+            }
+            case '4': {
+               std::cout << "La revedere!\n";
+               // localstorage
+               Sleep(4000);
+               return;
+            }
+         }
       }
+   }
+}
 
-   Client* verificareClient(){
+
+void Menu::actiuneConectat(Client* cln) {
+   std::cout << "Bine ati venit, Dl./Dna. " << cln->getNume() << "(Client ID: " << cln->getID() << ")!\n";
+}
+
+void Menu::afisareMeniuPrincipal() {
+   std::cout<<"-----Optiuni disponibile-----\n";
+   std::cout << "1. Conectare la contul dvs.\n";
+   std::cout << "2. Creati-va un cont\n";
+   std::cout << "3. FAQ\n";
+   std::cout << "4. Iesire\n";
+}
+
+Client* Menu::verificareClient(){
       system("cls");
       char buffer[20] = "";
       while(strlen(buffer) != 13){
@@ -195,7 +239,7 @@ private:
       return nullptr;
    }
 
-   Client* creareCont(){
+Client* Menu::creareCont(){
       char nume[50], prenume[50], initialaTata;
       int dataNasterii;
       long long CNP = 0;
@@ -223,7 +267,7 @@ private:
       return &listaClienti[Client::numarClienti - 1];
    }
 
-   void afisareFAQ(){
+void Menu::afisareFAQ(){
       system("cls");
       std::cout << "FAQ:\n";
       std::cout << "1. Cum imi pot schimba parola?\n";
@@ -247,26 +291,7 @@ private:
       }
 
    }
-};
 
-std::ostream& operator<<(std::ostream& out, const Client& obj) {
-   out << "Date Client:\n";
-   out << "ID: " << obj.ID_client << "\n";
-   out << "CNP: " << obj.CNP << "\n";
-   out << "Nume: " << obj.nume << " " << obj.initialaTata << " " << obj.prenume << "\n";
-   out << "Data Nasterii: " << obj.dataNasterii << "\n";
-   return out;
-}
-
-std::istream& operator>>(std::istream& in, Client& obj) {
-   char buffer[100];
-   std::cout << "Nume: ";
-   in.getline(buffer, 100);
-   obj.setName(buffer);
-   return in;
-}
-
-int Client::numarClienti = 0;
 
 int main() {
    Menu menu;
