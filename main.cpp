@@ -4,6 +4,8 @@
 #include <conio.h>
 #include <unordered_map>
 #include <cmath>
+#include <ctime>
+
 
 class Investment{
 
@@ -93,6 +95,45 @@ std::ostream& operator<<(std::ostream& out, const Investment& obj) {
     return out;
 }
 
+class Transaction{
+   public:
+      Transaction();
+      Transaction(const char* tip, int suma);
+
+      //getter
+      const char* getTip() const;
+      int getSuma() const;
+      const char* getData() const;
+      
+      friend std::ostream& operator<<(std::ostream& out, const Transaction& obj);
+
+   private:
+      char tip[20];
+      int suma;
+      char data[30];
+};
+
+Transaction::Transaction() {
+    strcpy(this->tip, "Necunoscut");
+    this->suma = 0;
+    strcpy(this->data, "---");
+}
+
+Transaction::Transaction(const char* tip, int suma){
+   strncpy(this->tip, tip, 19);
+   this->suma = suma;
+
+   time_t acum = time(0);
+   char *dt = ctime(&acum);
+   dt[strlen(dt) - 1] = '\0';
+   strcpy(this->data, dt);
+}
+
+std::ostream& operator<<(std::ostream& out, const Transaction& obj) {
+    out << "[" << obj.data << "] " << obj.tip << ": " << obj.suma << " RON";
+    return out;
+}
+
 class BankAccount{
    public:
       BankAccount();
@@ -109,10 +150,13 @@ class BankAccount{
       int getID() const;
       void setSold(int val);
       void setID(int val);
+      void printTransactionHistory();
 
    private:
       int sold;
       int accID;
+      Transaction istoric[10];
+      int nrTranzactii = 0;
 
 };
 
@@ -129,12 +173,20 @@ BankAccount::BankAccount(int val){
 BankAccount::BankAccount(const BankAccount& obj){
    this->sold = obj.sold;
    this->accID = obj.accID;
+   this->nrTranzactii = obj.nrTranzactii;
+   for(int i = 0; i < obj.nrTranzactii; i++){
+      this -> istoric[i] = obj.istoric[i];
+   }
 }
 
 BankAccount& BankAccount::operator=(const BankAccount& obj){
    if(this != &obj){
       this->sold = obj.sold;
       this->accID = obj.accID;
+      this->nrTranzactii = obj.nrTranzactii;
+      for(int i = 0; i < obj.nrTranzactii; i++){
+         this -> istoric[i] = obj.istoric[i];
+      }
    }
    return *this;
 }
@@ -152,11 +204,19 @@ std::istream& operator>>(std::istream& in, BankAccount& obj){
 
 void BankAccount::depunereFonduri(int suma){
    this->sold += suma;
+   if (nrTranzactii < 10) {
+      istoric[nrTranzactii] = Transaction("Depunere", suma);
+      nrTranzactii++;
+   }
 }
 
 void BankAccount::retragereFonduri(int suma){
    if(suma <= this->sold){
       this->sold -= suma;
+      if(nrTranzactii < 10){
+         istoric[nrTranzactii] = Transaction("Retragere", suma);
+         nrTranzactii++;
+      }
    }
    else{
       std::cout << "Fonduri insuficiente!\n";
@@ -179,6 +239,12 @@ void BankAccount::setID(int ID){
    this->accID = ID;
 }
 
+void BankAccount::printTransactionHistory(){
+   for (int i = 0; i < nrTranzactii; i++){
+      std::cout<<"Tranzactia " << i+1 <<":";
+      std::cout<<istoric[i]<<"\n";
+   }
+}
 
 class Client{
 public:
@@ -277,18 +343,24 @@ Client::Client(const Client& obj){
       for(int i = 0; i < 5; i++) this->conturi[i] = nullptr;
       
       for (int i = 0; i < obj.nrConturi; i++) {
-        this->conturi[i] = new BankAccount(*obj.conturi[i]);
+         if(obj.conturi[i] != nullptr)
+            this->conturi[i] = new BankAccount(*obj.conturi[i]);
     }
 };
 
 Client& Client::operator=(const Client& obj) {
       if (this != &obj) {
+         
+         for (int i = 0; i < 5; i++) {
+            if (this->conturi[i] != nullptr) {
+                delete this->conturi[i];
+                this->conturi[i] = nullptr;
+            }
+        }
+
          delete[] this->nume;
          delete[] this->prenume;
-         this->nume = new char[strlen(obj.nume) + 1];
-         strcpy(this->nume, obj.nume);
-         this->prenume = new char[strlen(obj.prenume) + 1];
-         strcpy(this->prenume, obj.prenume);
+         
          this->initialaTata = obj.initialaTata;
          this->dataNasterii = obj.dataNasterii;
          this->CNP = obj.CNP;
@@ -296,15 +368,14 @@ Client& Client::operator=(const Client& obj) {
          this->informationComplete = obj.informationComplete;
          this->nrConturi = obj.nrConturi;
 
-         for (int i = 0; i < this->nrConturi; i++) {
-             if(this->conturi[i] != nullptr){
-               delete this->conturi[i];
-               this->conturi[i] = nullptr; 
-             }
-        }
+         this->nume = new char[strlen(obj.nume) + 1];
+         strcpy(this->nume, obj.nume);
+         this->prenume = new char[strlen(obj.prenume) + 1];
+         strcpy(this->prenume, obj.prenume);
 
          for (int i = 0; i < obj.nrConturi; i++) {
-            this->conturi[i] = new BankAccount(*obj.conturi[i]);
+            if(obj.conturi[i] != nullptr)
+               this->conturi[i] = new BankAccount(*obj.conturi[i]);
         }
       }
       return *this;
@@ -438,13 +509,14 @@ void Menu::run(){
 
 void Menu::afisareMeniuConectat(const char* nume, const int id){
    std::cout << "Bine ati venit, Dl./Dna. " << nume << "(Client ID: " << id << ")!\n";
-   std::cout << "1. Vizualizare completa conturi:\n";
+   std::cout << "1. Vizualizare completa conturi\n";
    std::cout << "2. Depunere fonduri\n";
    std::cout << "3. Retragere fonduri\n";
    std::cout << "4. Simulare investitii\n";
    std::cout << "5. Deschideti un cont bancar nou\n";
-   std::cout << "6. Deconectare.\n";
-   std::cout << "7. Inchidere aplicatie.\n";
+   std::cout << "6. Istoricul tranzactiilor\n";
+   std::cout << "7. Deconectare.\n";
+   std::cout << "8. Inchidere aplicatie.\n";
 }
 
 int Menu::actiuneConectat(Client* cln) {
@@ -459,9 +531,9 @@ int Menu::actiuneConectat(Client* cln) {
          switch(optiune){
             case '1': {
                system("cls");
-               std::cout << "Conturile dvs.: (Vizibile pentru 10 secunde)\n";
+               std::cout << "Conturile dvs.: (Vizibile pentru 6 secunde)\n";
                cln->afisareCompletaConturi();
-               Sleep(13000);
+               Sleep(6000);
                system("cls");
                break;
             }
@@ -514,7 +586,7 @@ int Menu::actiuneConectat(Client* cln) {
                std::cout << "-----------------------------------------------------------------------" << std::endl;
                std::cout << "Suma de investit (RON): ";
                std::cin >> s;
-               std::cout << "Rata dobanzii anuale (scrieti 7 pentru 7%): "; 
+               std::cout << "Rata dobanzii anuale (scrieti 7 pentru 7%): ";
                std::cin >> r;
                std::cout << "Perioada (in luni): ";
                std::cin >> l;
@@ -553,9 +625,21 @@ int Menu::actiuneConectat(Client* cln) {
             }
             case '6':{
                system("cls");
-               return 0;
+               for (int i = 0; i < cln->nrConturi; i++){
+                  BankAccount* temp = cln->conturi[i];
+                  std::cout<< "Contul " << i+1 << " (Id: " << temp->getID() << "):\n";
+                  temp->printTransactionHistory();
+                  std::cout<<"\n";
+               }
+               Sleep(8500);
+               system("cls");
+               break;
             }
             case '7':{
+               system("cls");
+               return 0;
+            }
+            case '8':{
                return 1;
             }
             default:{
